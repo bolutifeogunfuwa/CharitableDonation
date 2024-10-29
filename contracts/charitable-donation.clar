@@ -62,3 +62,29 @@
       )
       (var-set charity-counter charity-id)
       (ok charity-id))))
+
+;; Make donation
+(define-public (donate (charity-id uint) (amount uint))
+  (let (
+    (donation-id (+ (var-get donation-counter) u1))
+    (charity (unwrap! (map-get? charities { charity-id: charity-id }) (err u404)))
+  )
+    (begin
+      (asserts! (is-eq (get active charity) true) (err u403))
+      (try! (stx-transfer? amount tx-sender (get wallet charity)))
+      (map-set donations
+        { donation-id: donation-id }
+        {
+          donor: tx-sender,
+          charity-id: charity-id,
+          amount: amount,
+          timestamp: block-height,
+          status: "completed"
+        }
+      )
+      (map-set charities
+        { charity-id: charity-id }
+        (merge charity { total-received: (+ (get total-received charity) amount) })
+      )
+      (var-set donation-counter donation-id)
+      (ok donation-id))))
