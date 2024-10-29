@@ -130,3 +130,15 @@
         })
       )
       (ok true))))
+
+;; Get charity details
+(define-read-only (get-charity-details (charity-id uint))
+  (map-get? charities { charity-id: charity-id }))
+
+;; Get donation details
+(define-read-only (get-donation-details (donation-id uint))
+  (map-get? donations { donation-id: donation-id }))
+
+;; Get milestone details
+(define-read-only (get-milestone-details (milestone-id uint))
+  (map-get? milestones { milestone-id: milestone-id }))
