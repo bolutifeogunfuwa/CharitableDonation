@@ -88,3 +88,25 @@
       )
       (var-set donation-counter donation-id)
       (ok donation-id))))
+
+;; Add milestone
+(define-public (add-milestone
+    (charity-id uint)
+    (description (string-ascii 256))
+    (target-amount uint)
+  )
+  (let ((milestone-id (+ (var-get milestone-counter) u1)))
+    (begin
+      (asserts! (is-eq tx-sender (var-get contract-owner)) (err u403))
+      (map-set milestones
+        { milestone-id: milestone-id }
+        {
+          charity-id: charity-id,
+          description: description,
+          target-amount: target-amount,
+          current-amount: u0,
+          completed: false
+        }
+      )
+      (var-set milestone-counter milestone-id)
+      (ok milestone-id))))
