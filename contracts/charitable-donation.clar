@@ -110,3 +110,23 @@
       )
       (var-set milestone-counter milestone-id)
       (ok milestone-id))))
+
+;; Update milestone progress
+(define-public (update-milestone-progress
+    (milestone-id uint)
+    (amount uint)
+  )
+  (let (
+    (milestone (unwrap! (map-get? milestones { milestone-id: milestone-id }) (err u404)))
+    (charity (unwrap! (map-get? charities { charity-id: (get charity-id milestone) }) (err u404)))
+  )
+    (begin
+      (asserts! (is-eq tx-sender (get wallet charity)) (err u403))
+      (map-set milestones
+        { milestone-id: milestone-id }
+        (merge milestone {
+          current-amount: (+ (get current-amount milestone) amount),
+          completed: (>= (+ (get current-amount milestone) amount) (get target-amount milestone))
+        })
+      )
+      (ok true))))
